@@ -1,0 +1,43 @@
+# SAM3 wrapper dependencies (Python 3.12+)
+# Install with: pip install -r requirements.txt
+# Then: cd sam3 && pip install -e . && cd ..
+
+# Deep Learning Framework (install separately first; see README step 2)
+# torch==2.7.0
+# torchvision==0.22.0
+# torchaudio==2.7.0
+
+# Computer vision / image processing
+opencv-python>=4.8.0
+pillow>=10.0.0
+scikit-image>=0.21.0
+scipy>=1.11.0
+
+# Numerics
+numpy<2,>=1.26  # SAM3 requires numpy<2
+
+# Visualization
+matplotlib>=3.7.0
+
+# Utilities
+tqdm>=4.65.0
+
+# Hugging Face Hub (for gated model access)
+huggingface_hub>=0.19.0
+
+# SAM3 runtime deps not auto-installed by sam3's pyproject.toml
+timm>=1.0.17
+ftfy==6.1.1
+regex
+iopath>=0.1.10
+typing_extensions
+einops>=0.8.0
+decord>=0.6.0
+pycocotools>=2.0.0
+psutil
+open_clip_torch
+hydra-core
+omegaconf
+
+# pkg_resources lives in setuptools, removed in 81+
+setuptools<81

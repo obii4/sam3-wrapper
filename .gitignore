@@ -1,0 +1,15 @@
+# Cloned SAM 3 repo — installed separately per README, not vendored here
+sam3/
+
+# Generated outputs
+results/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+
+# Environment
+.venv/
+venv/
