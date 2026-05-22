@@ -113,10 +113,10 @@ python segment.py <image_path> "<text_prompt>" [options]
 | `--confidence FLOAT` | Score threshold 0.0–1.0 (default: `0.3`) |
 | `--save-masks` | Also write `masks.npz` (compressed binary masks, keyed `<prompt>_NNN`) |
 
-**Example:**
+**Example** (using the bundled sample image):
 
 ```bash
-python segment.py photos/street.jpg "yellow taxi" --confidence 0.4
+python segment.py images/DSC_1132.jpg "glasses" --confidence 0.4
 ```
 
 The first run downloads SAM 3 weights (~several GB) from Hugging Face and caches them under `~/.cache/huggingface/`. Subsequent runs load from cache.
@@ -129,11 +129,11 @@ from segment import Sam3Wrapper
 wrapper = Sam3Wrapper(confidence_threshold=0.3)
 
 # Single prompt -> one result dict
-result = wrapper.segment("photos/street.jpg", "yellow taxi")
+result = wrapper.segment("images/DSC_1132.jpg", "glasses")
 print(f"Found {len(result['masks'])} instances")
 
 # Multiple prompts -> {prompt: result_dict}
-results = wrapper.segment("photos/street.jpg", ["yellow taxi", "pedestrian"])
+results = wrapper.segment("images/DSC_1132.jpg", ["glasses", "hat"])
 for prompt, r in results.items():
     print(prompt, len(r["masks"]))
 ```
