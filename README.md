@@ -29,18 +29,27 @@ binary = masks["glasses_000"]   # bool HxW array
 - Linux (tested) or macOS
 - Python 3.12+
 - NVIDIA GPU with CUDA 12.6+ (CPU works but is very slow)
-- A Hugging Face account with access to [`facebook/sam3`](https://huggingface.co/facebook/sam3) (see step 3)
+- A Hugging Face account with access to [`facebook/sam3`](https://huggingface.co/facebook/sam3) (see step 4)
 
 ## Installation
 
-### 1. Create a conda environment
+### 1. Clone this repo
+
+```bash
+git clone https://github.com/obii4/sam3-wrapper.git
+cd sam3-wrapper
+```
+
+All subsequent commands assume you're inside the `sam3-wrapper/` directory.
+
+### 2. Create a conda environment
 
 ```bash
 conda create -n sam3 python=3.12 -y
 conda activate sam3
 ```
 
-### 2. Install PyTorch (GPU build)
+### 3. Install PyTorch (GPU build)
 
 ```bash
 pip install torch==2.7.0 torchvision torchaudio \
@@ -53,7 +62,7 @@ If you don't have a GPU, install the CPU build instead:
 pip install torch==2.7.0 torchvision torchaudio
 ```
 
-### 3. Get Hugging Face access to SAM 3
+### 4. Get Hugging Face access to SAM 3
 
 SAM 3 weights are gated. You must do this before running the wrapper or model loading will fail.
 
@@ -76,7 +85,7 @@ SAM 3 weights are gated. You must do this before running the wrapper or model lo
    hf auth whoami
    ```
 
-### 4. Install wrapper + SAM 3 dependencies
+### 5. Install wrapper + SAM 3 dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -84,9 +93,9 @@ pip install -r requirements.txt
 
 This installs everything SAM 3 needs at runtime — including a handful of packages (`einops`, `pycocotools`, `decord`, ...) that SAM 3's own `pyproject.toml` under-declares as dependencies. Without these you'll hit cascading `ModuleNotFoundError`s.
 
-### 5. Clone and install SAM 3
+### 6. Clone and install SAM 3
 
-From this directory (`sam3_wrapper/`):
+Still inside `sam3-wrapper/`:
 
 ```bash
 git clone https://github.com/facebookresearch/sam3.git
@@ -118,6 +127,14 @@ python segment.py <image_path> "<text_prompt>" [options]
 ```bash
 python segment.py images/DSC_1132.jpg "glasses" --confidence 0.4
 ```
+
+**Application example — carbon fiber microscopy:**
+
+```bash
+python segment.py images/tile_r006_c003.png "thin white line" --confidence 0.3 --save-masks
+```
+
+The prompt `"thin white line"` reliably picks up individual fibers in polarized-light microscopy images; lowering `--confidence` to `0.3` catches faint fibers without flooding with false positives. `--save-masks` writes per-detection binary masks to `masks.npz` for downstream measurement.
 
 The first run downloads SAM 3 weights (~several GB) from Hugging Face and caches them under `~/.cache/huggingface/`. Subsequent runs load from cache.
 
@@ -152,8 +169,11 @@ Specific phrases work much better than generic ones. `"red sedan"` will beat `"c
 
 ## Troubleshooting
 
+**`No such file or directory: 'requirements.txt'` / `'segment.py'`**
+You're not inside the `sam3-wrapper/` directory. Make sure you ran `git clone https://github.com/obii4/sam3-wrapper.git` first, then `cd sam3-wrapper`.
+
 **`401 Unauthorized` or `gated repo` error when loading weights**
-You haven't been granted access to `facebook/sam3` yet, or you haven't run `hf auth login`. Re-do step 3.
+You haven't been granted access to `facebook/sam3` yet, or you haven't run `hf auth login`. Re-do step 4.
 
 **`CUDA out of memory`**
 Use a smaller image, or run on CPU by setting `device="cpu"` when constructing `Sam3Wrapper`.
@@ -168,7 +188,7 @@ pip install "setuptools<81"
 You skipped `pip install -r requirements.txt`. SAM 3 under-declares these in its own `pyproject.toml`, so the wrapper's `requirements.txt` pins them explicitly. Run it.
 
 **`ModuleNotFoundError: No module named 'sam3'`**
-You didn't run `pip install -e .` inside the cloned `sam3/` directory (step 4).
+You didn't run `pip install -e .` inside the cloned `sam3/` directory (step 6).
 
 **Slow first run**
 Normal — model weights are downloading. Watch `~/.cache/huggingface/` to confirm progress.
@@ -176,9 +196,10 @@ Normal — model weights are downloading. Watch `~/.cache/huggingface/` to confi
 ## Files
 
 ```
-sam3_wrapper/
+sam3-wrapper/
 ├── README.md          # This file
 ├── requirements.txt   # Wrapper dependencies (excludes torch + sam3)
 ├── segment.py         # CLI + Sam3Wrapper class
-└── sam3/              # Cloned from facebookresearch/sam3 (after step 4)
+├── images/            # Bundled sample images
+└── sam3/              # Cloned from facebookresearch/sam3 (after step 6)
 ```
