@@ -41,3 +41,7 @@ omegaconf
 
 # pkg_resources lives in setuptools, removed in 81+
 setuptools<81
+
+# Windows-only: triton has no official Windows wheel, so torch can't pull it in.
+# The community triton-windows package provides one.
+triton-windows; sys_platform == "win32"

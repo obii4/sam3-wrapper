@@ -28,7 +28,7 @@ binary = masks["glasses_000"]   # bool HxW array
 
 - Linux (tested) or macOS
 - Python 3.12+
-- NVIDIA GPU with CUDA 12.6+ (CPU works but is very slow)
+- **NVIDIA GPU with CUDA 12.6+ required.** CPU-only is currently broken — SAM 3 hardcodes `device="cuda"` in `position_encoding.py`, so passing `device="cpu"` won't work without patching SAM 3's source.
 - A Hugging Face account with access to [`facebook/sam3`](https://huggingface.co/facebook/sam3) (see step 4)
 
 ## Installation
@@ -56,11 +56,7 @@ pip install torch==2.7.0 torchvision torchaudio \
     --index-url https://download.pytorch.org/whl/cu126
 ```
 
-If you don't have a GPU, install the CPU build instead:
-
-```bash
-pip install torch==2.7.0 torchvision torchaudio
-```
+A GPU is required — see Requirements above for why CPU mode does not currently work.
 
 ### 4. Get Hugging Face access to SAM 3
 
@@ -186,6 +182,15 @@ pip install "setuptools<81"
 
 **`ModuleNotFoundError: No module named 'einops'` / `'pycocotools'` / `'decord'` / `'cv2'`**
 You skipped `pip install -r requirements.txt`. SAM 3 under-declares these in its own `pyproject.toml`, so the wrapper's `requirements.txt` pins them explicitly. Run it.
+
+**`ModuleNotFoundError: No module named 'triton'` (Windows)**
+There is no official `triton` Windows wheel, so PyTorch can't pull it in. The community `triton-windows` package fills the gap and is now pinned in `requirements.txt` for Windows. If you installed before this was added, run:
+```powershell
+pip install triton-windows
+```
+
+**`AssertionError: Torch not compiled with CUDA enabled`**
+You installed a CPU-only PyTorch build. SAM 3 hardcodes `device="cuda"` in its position-encoding module, so CPU mode is currently broken. Reinstall PyTorch with CUDA wheels (Installation step 3) on a CUDA-capable machine.
 
 **`ModuleNotFoundError: No module named 'sam3'`**
 You didn't run `pip install -e .` inside the cloned `sam3/` directory (step 6).
